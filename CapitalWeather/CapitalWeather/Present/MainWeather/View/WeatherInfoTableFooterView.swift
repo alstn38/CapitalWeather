@@ -51,7 +51,7 @@ final class WeatherInfoTableFooterView: UITableViewHeaderFooterView, ReusableVie
     }
     
     private func configureView() {
-        contentView.backgroundColor = UIColor(resource: .weatherBlue)
+        contentView.backgroundColor = UIColor(resource: .weatherLightBlue)
     }
     
     private func configureHierarchy() {

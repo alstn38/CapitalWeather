@@ -77,7 +77,7 @@ final class MainWeatherViewController: UIViewController {
     }
     
     private func configureView() {
-        view.backgroundColor = UIColor(resource: .weatherBlue)
+        view.backgroundColor = UIColor(resource: .weatherLightBlue)
     }
     
     private func configureHierarchy() {
