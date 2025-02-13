@@ -1,5 +1,5 @@
 //
-//  WeatherInfoCollectionHeaderView.swift
+//  WeatherInfoTableHeaderView.swift
 //  CapitalWeather
 //
 //  Created by 강민수 on 2/13/25.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class WeatherInfoCollectionHeaderView: UICollectionReusableView, ReusableViewProtocol {
+final class WeatherInfoTableHeaderView: UITableViewHeaderFooterView, ReusableViewProtocol {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
@@ -19,9 +19,10 @@ final class WeatherInfoCollectionHeaderView: UICollectionReusableView, ReusableV
         return label
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
         
+        configureView()
         configureHierarchy()
         configureLayout()
     }
@@ -29,6 +30,10 @@ final class WeatherInfoCollectionHeaderView: UICollectionReusableView, ReusableV
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func configureView() {
+        contentView.backgroundColor = UIColor(resource: .weatherBlue)
     }
     
     private func configureHierarchy() {
