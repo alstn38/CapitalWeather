@@ -1,5 +1,5 @@
 //
-//  WeatherInfoCollectionFooterView.swift
+//  WeatherInfoTableFooterView.swift
 //  CapitalWeather
 //
 //  Created by 강민수 on 2/13/25.
@@ -8,13 +8,13 @@
 import UIKit
 import SnapKit
 
-protocol WeatherInfoCollectionFooterViewDelegate: AnyObject {
-    func weatherInfoCollectionFooterViewDelegate(_ collectionReusableView: UICollectionReusableView)
+protocol WeatherInfoTableFooterViewDelegate: AnyObject {
+    func weatherInfoTableFooterViewViewDelegate(_ collectionReusableView: UITableViewHeaderFooterView)
 }
 
-final class WeatherInfoCollectionFooterView: UICollectionReusableView, ReusableViewProtocol {
+final class WeatherInfoTableFooterView: UITableViewHeaderFooterView, ReusableViewProtocol {
     
-    weak var delegate: WeatherInfoCollectionFooterViewDelegate?
+    weak var delegate: WeatherInfoTableFooterViewDelegate?
     
     private let moreInfoButton: UIButton = {
         var imageConfiguration = UIImage.SymbolConfiguration(pointSize: 10)
@@ -37,9 +37,10 @@ final class WeatherInfoCollectionFooterView: UICollectionReusableView, ReusableV
         return button
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
         
+        configureView()
         configureHierarchy()
         configureLayout()
     }
@@ -47,6 +48,10 @@ final class WeatherInfoCollectionFooterView: UICollectionReusableView, ReusableV
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func configureView() {
+        contentView.backgroundColor = UIColor(resource: .weatherBlue)
     }
     
     private func configureHierarchy() {
@@ -60,6 +65,6 @@ final class WeatherInfoCollectionFooterView: UICollectionReusableView, ReusableV
     }
     
     @objc private func moreInfoButtonDidTap(_ sender: UIButton) {
-        delegate?.weatherInfoCollectionFooterViewDelegate(self)
+        delegate?.weatherInfoTableFooterViewViewDelegate(self)
     }
 }
