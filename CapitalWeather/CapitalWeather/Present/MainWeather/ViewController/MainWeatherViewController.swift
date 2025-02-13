@@ -9,25 +9,25 @@ import UIKit
 import SnapKit
 
 final class MainWeatherViewController: UIViewController {
-
-    private let weatherInfoCollectionView: UICollectionView = {
-        let spacing: CGFloat = 10
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = spacing
-        layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .clear
-        return collectionView
+    
+    private let weatherInfoTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
+        tableView.showsHorizontalScrollIndicator = false
+        tableView.estimatedSectionHeaderHeight = 80
+        tableView.estimatedSectionFooterHeight = 80
+        tableView.sectionHeaderTopPadding = 0
+        tableView.rowHeight = UITableView.automaticDimension
+        return tableView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureNavigation()
+        configureTableView()
         configureView()
         configureHierarchy()
         configureLayout()
@@ -56,16 +56,36 @@ final class MainWeatherViewController: UIViewController {
         navigationItem.rightBarButtonItems = [searchButton, refreshButton]
     }
     
+    private func configureTableView() {
+        weatherInfoTableView.delegate = self
+        weatherInfoTableView.dataSource = self
+        
+        weatherInfoTableView.register(
+            WeatherInfoTableHeaderView.self,
+            forHeaderFooterViewReuseIdentifier: WeatherInfoTableHeaderView.identifier
+        )
+        
+        weatherInfoTableView.register(
+            WeatherInfoTableFooterView.self,
+            forHeaderFooterViewReuseIdentifier: WeatherInfoTableFooterView.identifier
+        )
+        
+        weatherInfoTableView.register(
+            WeatherInfoTableViewCell.self,
+            forCellReuseIdentifier: WeatherInfoTableViewCell.identifier
+        )
+    }
+    
     private func configureView() {
         view.backgroundColor = UIColor(resource: .weatherBlue)
     }
     
     private func configureHierarchy() {
-        view.addSubview(weatherInfoCollectionView)
+        view.addSubview(weatherInfoTableView)
     }
     
     private func configureLayout() {
-        weatherInfoCollectionView.snp.makeConstraints {
+        weatherInfoTableView.snp.makeConstraints {
             $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
@@ -77,5 +97,37 @@ final class MainWeatherViewController: UIViewController {
     
     @objc private func searchButtonDidTap(_ sender: UIBarButtonItem) {
         
+    }
+}
+
+// MARK: - UITableViewDelegate, UITableViewDataSource
+extension MainWeatherViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: WeatherInfoTableViewCell.identifier,
+            for: indexPath
+        ) as? WeatherInfoTableViewCell else { return UITableViewCell() }
+        
+        cell.configureView(.todayPhoto)
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerView = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: WeatherInfoTableHeaderView.identifier
+        ) as? WeatherInfoTableHeaderView else { return nil }
+        return headerView
+    }
+
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footerView = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: WeatherInfoTableFooterView.identifier
+        ) as? WeatherInfoTableFooterView else { return nil }
+        return footerView
     }
 }
