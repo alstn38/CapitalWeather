@@ -36,6 +36,7 @@ final class MainWeatherViewController: UIViewController {
     private func configureNavigation() {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "대한민국, 서울"
+        navigationItem.backButtonTitle = StringLiterals.NavigationItem.backButtonTitle
         
         let searchButton = UIBarButtonItem(
             image: UIImage(systemName: "magnifyingglass"),
@@ -51,8 +52,6 @@ final class MainWeatherViewController: UIViewController {
             action: #selector(refreshButtonDidTap)
         )
         
-        searchButton.tintColor = .black
-        refreshButton.tintColor = .black
         navigationItem.rightBarButtonItems = [searchButton, refreshButton]
     }
     
@@ -96,7 +95,8 @@ final class MainWeatherViewController: UIViewController {
     }
     
     @objc private func searchButtonDidTap(_ sender: UIBarButtonItem) {
-        
+        let searchViewController = SearchViewController()
+        navigationController?.pushViewController(searchViewController, animated: true)
     }
 }
 
