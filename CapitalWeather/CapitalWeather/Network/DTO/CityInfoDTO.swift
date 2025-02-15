@@ -1,0 +1,24 @@
+//
+//  CityInfoDTO.swift
+//  CapitalWeather
+//
+//  Created by 강민수 on 2/15/25.
+//
+
+import Foundation
+
+struct CityInfoDTO: Codable {
+    let city: String
+    let cityName: String
+    let country: String
+    let countryName: String
+    let id: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case city
+        case cityName = "ko_city_name"
+        case country
+        case countryName = "ko_country_name"
+        case id
+    }
+}
