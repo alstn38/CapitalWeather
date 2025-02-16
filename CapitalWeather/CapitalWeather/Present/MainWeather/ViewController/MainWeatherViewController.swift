@@ -61,7 +61,12 @@ final class MainWeatherViewController: UIViewController {
             navigationItem.title = countryName
         }
         
-        output.currentDate.bind { [weak self] _ in
+        output.updateCurrentDate.bind { [weak self] _ in
+            guard let self else { return }
+            weatherInfoTableView.reloadData()
+        }
+        
+        output.updateWeatherInfo.bind { [weak self] _ in
             guard let self else { return }
             weatherInfoTableView.reloadData()
         }
@@ -142,7 +147,7 @@ final class MainWeatherViewController: UIViewController {
 extension MainWeatherViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return viewModel.currentWeatherInfoArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -151,7 +156,7 @@ extension MainWeatherViewController: UITableViewDelegate, UITableViewDataSource 
             for: indexPath
         ) as? WeatherInfoTableViewCell else { return UITableViewCell() }
         
-        cell.configureView(.todayPhoto)
+        cell.configureView(viewModel.currentWeatherInfoArray[indexPath.row])
         return cell
     }
     

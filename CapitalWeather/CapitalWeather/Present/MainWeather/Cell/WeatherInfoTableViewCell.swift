@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 import SnapKit
 
 final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
@@ -20,13 +21,12 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     
     private let weatherIconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .gray // TODO: 삭제
+        imageView.contentMode = .scaleToFill
         return imageView
     }()
     
     private let weatherInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = "오늘의 날씨는 무엇무엇입니다." // TODO: 삭제
         label.font = .systemFont(ofSize: 15, weight: .regular)
         label.numberOfLines = 0
         return label
@@ -34,7 +34,6 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     
     private let weatherTemperatureLabel: UILabel = {
         let label = UILabel()
-        label.text = "최저 20° 최고 28°" // TODO: 삭제
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .lightGray
         label.numberOfLines = 0
@@ -62,8 +61,58 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureView(_ type: weatherInfoCellType) {
+    func configureView(_ type: MainWeatherViewModel.WeatherInfoType) {
         configureLayout(type)
+        
+        switch type {
+        case .weather(let icon, let description):
+            configureWeather(icon: icon, description: description)
+            
+        case .currentTemperature(let current, let min, let max):
+            configureTemperature(current: current, min: min, max: max)
+            
+        case .feelsLikeTemperature(let feel):
+            configureTemperature(feel: feel)
+            
+        case .sunRiseAndSetTime(let cityName, let rise, let set):
+            configureSunTime(cityName: cityName, rise: rise, set: set)
+            
+        case .humidityAndWindSpeed(let humidity, let windSpeed):
+            configureHumidityAndWindSpeed(humidity: humidity, windSpeed: windSpeed)
+            
+        case .todayPhoto(let photoLink):
+            print("todayPhoto")
+        }
+    }
+    
+    private func configureWeather(icon: String, description: String) {
+        weatherIconImageView.kf.setImage(with: URL(string: Secret.openWeatherIconURL(with: icon)))
+        
+        let weatherInfoText = "오늘의 날씨는 \(description) 입니다"
+        weatherInfoLabel.text = weatherInfoText
+    }
+    
+    private func configureTemperature(current: String, min: String, max: String) {
+        let weatherInfoText = "현재 온도는 \(current) 입니다"
+        weatherInfoLabel.text = weatherInfoText
+        
+        let weatherTemperatureText = "최저 \(min) 최고 \(max)"
+        weatherTemperatureLabel.text = weatherTemperatureText
+    }
+    
+    private func configureTemperature(feel: String) {
+        let weatherInfoText = "체감 온도는 \(feel) 입니다"
+        weatherInfoLabel.text = weatherInfoText
+    }
+    
+    private func configureSunTime(cityName: String, rise: String, set: String) {
+        let weatherInfoText = "\(cityName)의 일출 시각은 \(rise), 일몰 시각은 \(set)입니다."
+        weatherInfoLabel.text = weatherInfoText
+    }
+    
+    private func configureHumidityAndWindSpeed(humidity: String, windSpeed: String) {
+        let weatherInfoText = "습도는 \(humidity)이고, 풍속은 \(windSpeed) 입니다"
+        weatherInfoLabel.text = weatherInfoText
     }
     
     private func configureView() {
@@ -80,7 +129,7 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
         )
     }
     
-    private func configureLayout(_ type: weatherInfoCellType) {
+    private func configureLayout(_ type: MainWeatherViewModel.WeatherInfoType) {
         infoBackgroundView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(20)
             $0.trailing.lessThanOrEqualToSuperview().inset(20)
@@ -92,13 +141,13 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
         switch type {
         case .weather:
             weatherIconImageView.snp.makeConstraints {
-                $0.leading.equalTo(infoBackgroundView).offset(20)
+                $0.leading.equalTo(infoBackgroundView)
                 $0.centerY.equalToSuperview()
-                $0.size.equalTo(25)
+                $0.size.equalTo(40)
             }
             
             weatherInfoLabel.snp.makeConstraints {
-                $0.leading.equalTo(weatherIconImageView.snp.trailing).offset(10)
+                $0.leading.equalTo(weatherIconImageView.snp.trailing)
                 $0.trailing.equalTo(infoBackgroundView).inset(20)
                 $0.centerY.equalToSuperview()
             }
@@ -142,18 +191,5 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
                 $0.horizontalEdges.equalTo(infoBackgroundView).inset(20)
             }
         }
-    }
-}
-
-// MARK: - WeatherInfoTableViewCell View Type
-extension WeatherInfoTableViewCell {
-    
-    enum weatherInfoCellType {
-        case weather
-        case currentTemperature
-        case feelsLikeTemperature
-        case sunRiseAndSetTime
-        case humidityAndWindSpeed
-        case todayPhoto
     }
 }
