@@ -26,7 +26,7 @@ extension WeatherIconEndPoint {
     var path: String {
         switch self {
         case .weatherIcon(let icon):
-            return "/img/wn/icon@2x.png"
+            return "/img/wn/\(icon)@2x.png"
         }
     }
     
