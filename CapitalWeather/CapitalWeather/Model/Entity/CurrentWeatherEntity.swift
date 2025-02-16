@@ -18,4 +18,5 @@ struct CurrentWeatherEntity {
     let sunset: Int
     let humidity: Int
     let windSpeed: Double
+    let photoDescription: String
 }

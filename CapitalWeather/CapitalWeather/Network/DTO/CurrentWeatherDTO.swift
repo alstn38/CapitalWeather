@@ -31,14 +31,22 @@ struct CurrentWeatherDTO: Decodable {
             sunrise: self.weatherSun.sunrise,
             sunset: self.weatherSun.sunset,
             humidity: self.weatherTemperature.humidity,
-            windSpeed: self.wind.speed
+            windSpeed: self.wind.speed,
+            photoDescription: self.weather.first?.photoDescription ?? ""
         )
     }
 }
 
 struct Weather: Decodable {
+    let photoDescription: String
     let description: String
     let icon: String
+    
+    enum CodingKeys: String, CodingKey {
+        case photoDescription = "main"
+        case description
+        case icon
+    }
 }
 
 struct WeatherTemperature: Decodable {
