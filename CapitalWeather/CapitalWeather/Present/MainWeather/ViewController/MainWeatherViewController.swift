@@ -10,6 +10,9 @@ import SnapKit
 
 final class MainWeatherViewController: UIViewController {
     
+    private let viewModel: MainWeatherViewModel
+    private let input: MainWeatherViewModel.Input
+    
     private let weatherInfoTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
@@ -23,19 +26,49 @@ final class MainWeatherViewController: UIViewController {
         return tableView
     }()
     
+    init(viewModel: MainWeatherViewModel) {
+        self.viewModel = viewModel
+        self.input = MainWeatherViewModel.Input(
+            viewDidLoad: CurrentValueRelay(()),
+            refreshButtonDidTap: CurrentValueRelay(()),
+            searchButtonDidTap: CurrentValueRelay(())
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureBindingData()
         configureNavigation()
         configureTableView()
         configureView()
         configureHierarchy()
         configureLayout()
+        input.viewDidLoad.send(())
+    }
+    
+    private func configureBindingData() {
+        let output = viewModel.transform(from: input)
+        
+        output.selectCountryName.bind { [weak self] countryName in
+            guard let self else { return }
+            navigationItem.title = countryName
+        }
+        
+        output.presentError.bind { [weak self] (title, message) in
+            guard let self else { return }
+            presentAlert(title: title, message: message)
+        }
     }
     
     private func configureNavigation() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "대한민국, 서울"
         navigationItem.backButtonTitle = StringLiterals.NavigationItem.backButtonTitle
         
         let searchButton = UIBarButtonItem(
