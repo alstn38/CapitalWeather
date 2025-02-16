@@ -13,6 +13,12 @@ enum StringLiterals {
         static let backButtonTitle: String = ""
     }
     
+    enum Alert {
+        static let confirm: String = "확인"
+        static let localError: String = "로컬 오류"
+        static let networkError: String = "네트워크 오류"
+    }
+    
     enum MainWeatherView {
         static let moreInfoButtonTitle: String = "5일간 예보 보러가기"
     }
