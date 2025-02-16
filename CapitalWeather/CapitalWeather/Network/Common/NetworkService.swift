@@ -20,8 +20,7 @@ final class NetworkService {
     ) {
         AF.request(router)
             .validate(statusCode: 200...299)
-            .responseDecodable(of: U.self) { [weak self] response in
-                guard let self else { return }
+            .responseDecodable(of: U.self) { response in
                 switch response.result {
                 case .success(let value):
                     completionHandler(.success(value))
