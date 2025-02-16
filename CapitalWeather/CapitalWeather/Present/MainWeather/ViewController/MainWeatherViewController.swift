@@ -61,6 +61,12 @@ final class MainWeatherViewController: UIViewController {
             navigationItem.title = countryName
         }
         
+        output.moveToSearchController.bind { [weak self] _ in
+            guard let self else { return }
+            let searchViewController = SearchViewController()
+            navigationController?.pushViewController(searchViewController, animated: true)
+        }
+        
         output.updateCurrentDate.bind { [weak self] _ in
             guard let self else { return }
             weatherInfoTableView.reloadData()
@@ -134,12 +140,11 @@ final class MainWeatherViewController: UIViewController {
     
     // MARK: - @objc func
     @objc private func refreshButtonDidTap(_ sender: UIBarButtonItem) {
-        
+        input.refreshButtonDidTap.send(())
     }
     
     @objc private func searchButtonDidTap(_ sender: UIBarButtonItem) {
-        let searchViewController = SearchViewController()
-        navigationController?.pushViewController(searchViewController, animated: true)
+        input.searchButtonDidTap.send(())
     }
 }
 

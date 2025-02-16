@@ -42,10 +42,9 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     
     private let todayWeatherImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = 10
+        imageView.layer.cornerRadius = 5
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = .gray // TODO: 삭제
         return imageView
     }()
     
@@ -59,6 +58,18 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        weatherIconImageView.image = nil
+        weatherInfoLabel.text = nil
+        weatherTemperatureLabel.text = nil
+        todayWeatherImageView.image = nil
+        
+        [contentView, infoBackgroundView, weatherIconImageView, weatherInfoLabel, weatherTemperatureLabel, todayWeatherImageView].forEach {
+            $0.snp.removeConstraints()
+        }
     }
     
     func configureView(_ type: MainWeatherViewModel.WeatherInfoType) {
@@ -81,7 +92,7 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
             configureHumidityAndWindSpeed(humidity: humidity, windSpeed: windSpeed)
             
         case .todayPhoto(let photoLink):
-            print("todayPhoto")
+            configureTodayPhoto(photoLink: photoLink)
         }
     }
     
@@ -113,6 +124,12 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     private func configureHumidityAndWindSpeed(humidity: String, windSpeed: String) {
         let weatherInfoText = "습도는 \(humidity)이고, 풍속은 \(windSpeed) 입니다"
         weatherInfoLabel.text = weatherInfoText
+    }
+    
+    private func configureTodayPhoto(photoLink: String) {
+        let weatherInfoText = "오늘의 사진"
+        weatherInfoLabel.text = weatherInfoText
+        todayWeatherImageView.kf.setImage(with: URL(string: photoLink))
     }
     
     private func configureView() {
@@ -187,7 +204,7 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
             todayWeatherImageView.snp.makeConstraints {
                 $0.top.equalTo(weatherInfoLabel.snp.bottom).offset(10)
                 $0.horizontalEdges.equalToSuperview().inset(40)
-                $0.height.equalTo(150)
+                $0.height.equalTo(200)
                 $0.horizontalEdges.equalTo(infoBackgroundView).inset(20)
             }
         }

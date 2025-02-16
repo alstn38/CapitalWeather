@@ -17,6 +17,7 @@ final class MainWeatherViewModel: InputOutputModel {
     
     struct Output {
         let selectCountryName: CurrentValueRelay<String>
+        let moveToSearchController: CurrentValueRelay<Void>
         let updateCurrentDate: CurrentValueRelay<Void>
         let updateWeatherInfo: CurrentValueRelay<Void>
         let presentError: CurrentValueRelay<(title: String, message: String)>
@@ -24,6 +25,7 @@ final class MainWeatherViewModel: InputOutputModel {
     
     private let output = Output(
         selectCountryName: CurrentValueRelay(""),
+        moveToSearchController: CurrentValueRelay(()),
         updateCurrentDate: CurrentValueRelay(()),
         updateWeatherInfo: CurrentValueRelay(()),
         presentError: CurrentValueRelay((title: "", message: ""))
@@ -53,6 +55,19 @@ final class MainWeatherViewModel: InputOutputModel {
             fetchCountryName(at: currentCityID)
             fetchCurrentDate()
             fetchCurrentWeatherInfo(at: currentCityID)
+        }
+        
+        input.refreshButtonDidTap.bind { [weak self] _ in
+            guard let self else { return }
+            currentWeatherInfoArray.removeAll()
+            fetchCountryName(at: currentCityID)
+            fetchCurrentDate()
+            fetchCurrentWeatherInfo(at: currentCityID)
+        }
+        
+        input.searchButtonDidTap.bind { [weak self] _ in
+            guard let self else { return }
+            output.moveToSearchController.send(())
         }
         
         return output
@@ -102,6 +117,26 @@ final class MainWeatherViewModel: InputOutputModel {
                 updateWeatherFeelsLikeTemperature(from: currentWeatherEntity)
                 updateWeatherSunTime(from: currentWeatherEntity)
                 updateHumidityAndWindSpeed(from: currentWeatherEntity)
+                fetchTodayPhotoLink(with: currentWeatherEntity.photoDescription)
+                
+            case .failure(let error):
+                output.presentError.send((
+                    title: StringLiterals.Alert.networkError,
+                    message: error.localizedDescription
+                ))
+            }
+        }
+    }
+    
+    /// 오늘의 날씨 사진 링크를 가져오는 메서드
+    private func fetchTodayPhotoLink(with description: String) {
+        weatherNetworkService.fetchTodayPhotoLink(with: description) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let searchPhotoEntity):
+                let todayPhoto = WeatherInfoType.todayPhoto(photoLink: searchPhotoEntity.photoLink)
+                currentWeatherInfoArray.append(todayPhoto)
                 output.updateCurrentDate.send(())
                 
             case .failure(let error):
