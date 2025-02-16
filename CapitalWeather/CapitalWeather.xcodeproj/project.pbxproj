@@ -221,6 +221,8 @@
 		};
 		F1B490B12D5DD90600C3076F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = F1B4909D2D5DD90400C3076F /* CapitalWeather */;
+			baseConfigurationReferenceRelativePath = Resource/APIKey.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -284,6 +286,8 @@
 		};
 		F1B490B22D5DD90600C3076F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = F1B4909D2D5DD90400C3076F /* CapitalWeather */;
+			baseConfigurationReferenceRelativePath = Resource/APIKey.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
