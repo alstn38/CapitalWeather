@@ -12,6 +12,11 @@ protocol WeatherNetworkServiceInterface {
         at cityID: Int,
         completionHandler: @escaping (Result<CurrentWeatherEntity, WeatherAPIError>) -> Void
     )
+    
+    func fetchTodayPhotoLink(
+        with description: String,
+        completionHandler: @escaping (Result<SearchPhotoEntity, UnsplashAPIError>) -> Void
+    )
 }
 
 final class WeatherNetworkService: WeatherNetworkServiceInterface {
@@ -29,6 +34,26 @@ final class WeatherNetworkService: WeatherNetworkServiceInterface {
                 case .success(let currentWeatherDTO):
                     let currentWeatherEntity = currentWeatherDTO.toEntity()
                     completionHandler(.success(currentWeatherEntity))
+                    
+                case .failure(let error):
+                    completionHandler(.failure(error))
+                }
+            }
+    }
+    
+    func fetchTodayPhotoLink(
+        with description: String,
+        completionHandler: @escaping (Result<SearchPhotoEntity, UnsplashAPIError>) -> Void
+    ) {
+        let endpoint = UnsplashEndpoint.search(query: description)
+        
+        NetworkService.shared.request(
+            router: endpoint,
+            responseType: UnsplashSearchPhotoDTO.self) { result in
+                switch result {
+                case .success(let searchPhotoDTO):
+                    let searchPhotoEntity = searchPhotoDTO.toEntity()
+                    completionHandler(.success(searchPhotoEntity))
                     
                 case .failure(let error):
                     completionHandler(.failure(error))
