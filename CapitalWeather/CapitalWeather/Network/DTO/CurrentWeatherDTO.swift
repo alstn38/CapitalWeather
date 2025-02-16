@@ -19,6 +19,21 @@ struct CurrentWeatherDTO: Decodable {
         case wind
         case weatherSun = "sys"
     }
+    
+    func toEntity() -> CurrentWeatherEntity {
+        return CurrentWeatherEntity(
+            icon: self.weather.first?.icon ?? "",
+            description: self.weather.first?.description ?? "",
+            currentTemperature: self.weatherTemperature.currentTemperature,
+            minTemperature: self.weatherTemperature.minTemperature,
+            maxTemperature: self.weatherTemperature.maxTemperature,
+            feelsTemperature: self.weatherTemperature.feelsTemperature,
+            sunrise: self.weatherSun.sunrise,
+            sunset: self.weatherSun.sunset,
+            humidity: self.weatherTemperature.humidity,
+            windSpeed: self.wind.speed
+        )
+    }
 }
 
 struct Weather: Decodable {
