@@ -24,6 +24,7 @@ final class LocalService {
             withExtension: extensionType
         ) else {
             completionHandler(.failure(.invalidPath))
+            return
         }
         
         do {
