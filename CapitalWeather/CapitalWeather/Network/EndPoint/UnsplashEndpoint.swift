@@ -57,12 +57,7 @@ extension UnsplashEndpoint {
         
         do {
             var request = try URLRequest(url: url, method: method, headers: headers)
-            
-            if let parameters {
-                let jsonData = try JSONSerialization.data(withJSONObject: parameters)
-                request.httpBody = jsonData
-            }
-            
+            request = try URLEncoding.default.encode(request, with: parameters)
             return request
         } catch {
             throw ErrorType.badRequest
