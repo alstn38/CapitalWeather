@@ -7,7 +7,11 @@
 
 import Foundation
 
-struct CityInfoDTO: Codable {
+struct CityInfoListDTO: Decodable {
+    let cities: [CityInfoDTO]
+}
+
+struct CityInfoDTO: Decodable {
     let city: String
     let cityName: String
     let country: String
@@ -20,5 +24,13 @@ struct CityInfoDTO: Codable {
         case country
         case countryName = "ko_country_name"
         case id
+    }
+    
+    func toEntity() -> CityInfoEntity {
+        return CityInfoEntity(
+            cityName: self.cityName,
+            countryName: self.countryName,
+            id: self.id
+        )
     }
 }
