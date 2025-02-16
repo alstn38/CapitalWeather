@@ -40,7 +40,4 @@ final class UserDefaultManager {
     
     @UserDefault(key: UserDefaultKey.selectCityID.key, defaultValue: 1835848)
     var selectCityID
-    
-    @UserDefault(key: UserDefaultKey.selectCityName.key, defaultValue: "대한민국, 서울")
-    var selectCityName
 }
