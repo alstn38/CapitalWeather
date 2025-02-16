@@ -13,7 +13,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
-        let mainWeatherViewController = MainWeatherViewController()
+        let localCountyService = LocalCountyService()
+        let weatherNetworkService = WeatherNetworkService()
+        let viewModel = MainWeatherViewModel(
+            localCountyService: localCountyService,
+            weatherNetworkService: weatherNetworkService
+        )
+        let mainWeatherViewController = MainWeatherViewController(viewModel: viewModel)
         let mainNavigationController = UINavigationController(rootViewController: mainWeatherViewController)
         window = UIWindow(windowScene: scene)
         window?.rootViewController = mainNavigationController
