@@ -17,13 +17,17 @@ final class MainWeatherViewModel: InputOutputModel {
     
     struct Output {
         let selectCountryName: CurrentValueRelay<String>
+        let currentDate: CurrentValueRelay<Void>
         let presentError: CurrentValueRelay<(title: String, message: String)>
     }
     
     private let output = Output(
         selectCountryName: CurrentValueRelay(""),
+        currentDate: CurrentValueRelay(()),
         presentError: CurrentValueRelay((title: "", message: ""))
     )
+    
+    private(set) var currentDateString: String = ""
     
     private let currentCityID: Int
     private let localCountyService: LocalCountyServiceInterface
@@ -37,11 +41,13 @@ final class MainWeatherViewModel: InputOutputModel {
         input.viewDidLoad.bind { [weak self] _ in
             guard let self else { return }
             fetchCountryName(at: currentCityID)
+            fetchCurrentDate()
         }
         
         return output
     }
     
+    /// Local json에서 일치하는 id의 국가명, 도시명을 가져오는 메서드
     private func fetchCountryName(at id: Int) {
         localCountyService.fetchCountryInfo(at: currentCityID) { [weak self] result in
             guard let self else { return }
@@ -58,6 +64,18 @@ final class MainWeatherViewModel: InputOutputModel {
                 ))
             }
         }
+    }
+    
+    /// 현재 시간을 M월 d일(E) a h시 m분형식으로 가져오는 메서드
+    private func fetchCurrentDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.dateFormat = "M월 d일(E) a h시 m분"
+
+        let date = Date()
+        let formattedDate = dateFormatter.string(from: date)
+        currentDateString = formattedDate
+        output.currentDate.send(())
     }
 }
 

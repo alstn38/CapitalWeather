@@ -61,6 +61,11 @@ final class MainWeatherViewController: UIViewController {
             navigationItem.title = countryName
         }
         
+        output.currentDate.bind { [weak self] _ in
+            guard let self else { return }
+            weatherInfoTableView.reloadData()
+        }
+        
         output.presentError.bind { [weak self] (title, message) in
             guard let self else { return }
             presentAlert(title: title, message: message)
@@ -154,6 +159,8 @@ extension MainWeatherViewController: UITableViewDelegate, UITableViewDataSource 
         guard let headerView = tableView.dequeueReusableHeaderFooterView(
             withIdentifier: WeatherInfoTableHeaderView.identifier
         ) as? WeatherInfoTableHeaderView else { return nil }
+        
+        headerView.configureView(date: viewModel.currentDateString)
         return headerView
     }
 

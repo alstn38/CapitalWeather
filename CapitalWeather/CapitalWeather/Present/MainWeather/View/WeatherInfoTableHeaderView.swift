@@ -12,7 +12,6 @@ final class WeatherInfoTableHeaderView: UITableViewHeaderFooterView, ReusableVie
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "1월 29일(수) 오후 3시 12분" // TODO: 삭제
         label.textColor = .black
         label.font = .systemFont(ofSize: 14, weight: .bold)
         label.numberOfLines = 1
@@ -30,6 +29,10 @@ final class WeatherInfoTableHeaderView: UITableViewHeaderFooterView, ReusableVie
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configureView(date: String) {
+        dateLabel.text = date
     }
     
     private func configureView() {
