@@ -10,4 +10,11 @@ import Foundation
 struct SearchWeatherEntity {
     let cityInfoEntity: CityInfoEntity
     let currentWeatherEntity: CurrentWeatherEntity
+    
+    func hasSearchText(text: String) -> Bool {
+        return cityInfoEntity.cityKoreanName.contains(text)
+        || cityInfoEntity.cityEnglishName.lowercased().contains(text)
+        || cityInfoEntity.countryKoreanName.contains(text)
+        || cityInfoEntity.countryEnglishName.lowercased().contains(text)
+    }
 }
