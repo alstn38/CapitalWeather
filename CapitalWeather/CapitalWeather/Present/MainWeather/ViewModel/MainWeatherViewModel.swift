@@ -36,16 +36,16 @@ final class MainWeatherViewModel: InputOutputModel {
     private var cityName: String = ""
     
     private let currentCityID: Int
-    private let localCountyService: LocalCountyServiceInterface
+    private let localCountryService: LocalCountryServiceInterface
     private let weatherNetworkService: WeatherNetworkServiceInterface
 
     init(
         currentCityID: Int = UserDefaultManager.shared.selectCityID,
-        localCountyService: LocalCountyServiceInterface,
+        localCountryService: LocalCountryServiceInterface,
         weatherNetworkService: WeatherNetworkServiceInterface
     ) {
         self.currentCityID = currentCityID
-        self.localCountyService = localCountyService
+        self.localCountryService = localCountryService
         self.weatherNetworkService = weatherNetworkService
     }
     
@@ -75,7 +75,7 @@ final class MainWeatherViewModel: InputOutputModel {
     
     /// Local json에서 일치하는 id의 국가명, 도시명을 가져오는 메서드
     private func fetchCountryName(at id: Int) {
-        localCountyService.fetchCountryInfo(at: currentCityID) { [weak self] result in
+        localCountryService.fetchCountryInfo(at: currentCityID) { [weak self] result in
             guard let self else { return }
             
             switch result {
@@ -161,9 +161,9 @@ final class MainWeatherViewModel: InputOutputModel {
     /// 현재 온도 정보를 업데이트하는 메서드
     private func updateWeatherTemperature(from weatherInfo: CurrentWeatherEntity) {
         let weatherTemperature = WeatherInfoType.currentTemperature(
-            current: String(format: "%.1f°", weatherInfo.currentTemperature - 273.15),
-            min: String(format: "%.1f°", weatherInfo.minTemperature - 273.15),
-            max: String(format: "%.1f°", weatherInfo.maxTemperature - 273.15)
+            current: String(format: "%.1f°", weatherInfo.currentTemperature),
+            min: String(format: "%.1f°", weatherInfo.minTemperature),
+            max: String(format: "%.1f°", weatherInfo.maxTemperature)
         )
         
         currentWeatherInfoArray.append(weatherTemperature)
@@ -172,7 +172,7 @@ final class MainWeatherViewModel: InputOutputModel {
     /// 현재 체감온도 정보를 업데이트하는 메서드
     private func updateWeatherFeelsLikeTemperature(from weatherInfo: CurrentWeatherEntity) {
         let weatherFeelsLikeTemperature = WeatherInfoType.feelsLikeTemperature(
-            feel: String(format: "%.1f°", weatherInfo.feelsTemperature - 273.15)
+            feel: String(format: "%.1f°", weatherInfo.feelsTemperature)
         )
         
         currentWeatherInfoArray.append(weatherFeelsLikeTemperature)
