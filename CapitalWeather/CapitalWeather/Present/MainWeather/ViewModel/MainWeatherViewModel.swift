@@ -13,6 +13,7 @@ final class MainWeatherViewModel: InputOutputModel {
         let viewDidLoad: CurrentValueRelay<Void>
         let refreshButtonDidTap: CurrentValueRelay<Void>
         let searchButtonDidTap: CurrentValueRelay<Void>
+        let updateWeatherInfo: CurrentValueRelay<Int>
     }
     
     struct Output {
@@ -40,11 +41,10 @@ final class MainWeatherViewModel: InputOutputModel {
     private let weatherNetworkService: WeatherNetworkServiceInterface
 
     init(
-        currentCityID: Int = UserDefaultManager.shared.selectCityID,
         localCountryService: LocalCountryServiceInterface,
         weatherNetworkService: WeatherNetworkServiceInterface
     ) {
-        self.currentCityID = currentCityID
+        self.currentCityID = UserDefaultManager.shared.selectCityID
         self.localCountryService = localCountryService
         self.weatherNetworkService = weatherNetworkService
     }
@@ -68,6 +68,15 @@ final class MainWeatherViewModel: InputOutputModel {
         input.searchButtonDidTap.bind { [weak self] _ in
             guard let self else { return }
             output.moveToSearchController.send(())
+        }
+        
+        input.updateWeatherInfo.bind { [weak self] weatherID in
+            guard let self else { return }
+            UserDefaultManager.shared.selectCityID = weatherID
+            currentWeatherInfoArray.removeAll()
+            fetchCountryName(at: currentCityID)
+            fetchCurrentDate()
+            fetchCurrentWeatherInfo(at: currentCityID)
         }
         
         return output

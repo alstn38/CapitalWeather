@@ -31,7 +31,8 @@ final class MainWeatherViewController: UIViewController {
         self.input = MainWeatherViewModel.Input(
             viewDidLoad: CurrentValueRelay(()),
             refreshButtonDidTap: CurrentValueRelay(()),
-            searchButtonDidTap: CurrentValueRelay(())
+            searchButtonDidTap: CurrentValueRelay(()),
+            updateWeatherInfo: CurrentValueRelay(0)
         )
         super.init(nibName: nil, bundle: nil)
     }
@@ -70,6 +71,7 @@ final class MainWeatherViewController: UIViewController {
                 weatherNetworkService: weatherNetworkService
             )
             let searchViewController = SearchViewController(viewModel: searchViewModel)
+            searchViewController.delegate = self
             navigationController?.pushViewController(searchViewController, animated: true)
         }
         
@@ -185,5 +187,13 @@ extension MainWeatherViewController: UITableViewDelegate, UITableViewDataSource 
             withIdentifier: WeatherInfoTableFooterView.identifier
         ) as? WeatherInfoTableFooterView else { return nil }
         return footerView
+    }
+}
+
+// MARK: - SearchViewControllerDelegate
+extension MainWeatherViewController: SearchViewControllerDelegate {
+    
+    func viewController(_ viewController: UIViewController, updateIDAt weatherID: Int) {
+        input.updateWeatherInfo.send(weatherID)
     }
 }
