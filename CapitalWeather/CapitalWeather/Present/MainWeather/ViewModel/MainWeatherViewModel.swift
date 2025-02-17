@@ -80,8 +80,8 @@ final class MainWeatherViewModel: InputOutputModel {
             
             switch result {
             case .success(let cityInfoEntity):
-                let selectedCountryName = [cityInfoEntity.countryName, cityInfoEntity.cityName].joined(separator: ", ")
-                cityName = cityInfoEntity.cityName
+                let selectedCountryName = [cityInfoEntity.countryKoreanName, cityInfoEntity.cityKoreanName].joined(separator: ", ")
+                cityName = cityInfoEntity.cityKoreanName
                 output.selectCountryName.send(selectedCountryName)
                 
             case .failure(let error):

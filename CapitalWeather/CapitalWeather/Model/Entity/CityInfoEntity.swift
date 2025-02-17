@@ -8,7 +8,9 @@
 import Foundation
 
 struct CityInfoEntity {
-    let cityName: String
-    let countryName: String
+    let cityEnglishName: String
+    let cityKoreanName: String
+    let countryEnglishName: String
+    let countryKoreanName: String
     let id: Int
 }

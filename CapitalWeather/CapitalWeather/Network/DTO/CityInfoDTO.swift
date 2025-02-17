@@ -28,8 +28,10 @@ struct CityInfoDTO: Decodable {
     
     func toEntity() -> CityInfoEntity {
         return CityInfoEntity(
-            cityName: self.cityName,
-            countryName: self.countryName,
+            cityEnglishName: self.city,
+            cityKoreanName: self.cityName,
+            countryEnglishName: self.country,
+            countryKoreanName: self.countryName,
             id: self.id
         )
     }
