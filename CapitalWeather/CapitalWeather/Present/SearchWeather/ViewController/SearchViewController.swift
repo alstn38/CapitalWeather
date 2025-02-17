@@ -8,10 +8,15 @@
 import UIKit
 import SnapKit
 
+protocol SearchViewControllerDelegate: AnyObject {
+    func viewController(_ viewController: UIViewController, updateIDAt weatherID: Int)
+}
+
 final class SearchViewController: UIViewController {
     
     private let viewModel: SearchViewModel
     private let input: SearchViewModel.Input
+    weak var delegate: SearchViewControllerDelegate?
 
     private let weatherSearchController: UISearchController = {
         let searchController = UISearchController()
@@ -49,7 +54,8 @@ final class SearchViewController: UIViewController {
         self.input = SearchViewModel.Input(
             viewDidLoad: CurrentValueRelay(()),
             searchTextDidChange: CurrentValueRelay(("")),
-            searchButtonDidTap: CurrentValueRelay(())
+            searchButtonDidTap: CurrentValueRelay(()),
+            searchWeatherCellDidTap: CurrentValueRelay(0)
         )
         super.init(nibName: nil, bundle: nil)
     }
@@ -87,6 +93,12 @@ final class SearchViewController: UIViewController {
         output.dismissKeyboard.bind { [weak self] _ in
             guard let self else { return }
             view.endEditing(true)
+        }
+        
+        output.moveToMainController.bind { [weak self] weatherID in
+            guard let self else { return }
+            delegate?.viewController(self, updateIDAt: weatherID)
+            navigationController?.popViewController(animated: true)
         }
         
         output.presentError.bind { [weak self] (title, message) in
@@ -151,6 +163,10 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         
         cell.configureView(with: viewModel.filteredWeatherArray[indexPath.item])
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        input.searchWeatherCellDidTap.send(indexPath.item)
     }
 }
 

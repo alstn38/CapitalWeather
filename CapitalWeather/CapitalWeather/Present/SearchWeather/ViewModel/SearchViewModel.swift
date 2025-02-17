@@ -9,30 +9,33 @@ import Foundation
 
 final class SearchViewModel: InputOutputModel {
     
-    typealias ID = Int
+    typealias WeatherID = Int
     
     struct Input {
         let viewDidLoad: CurrentValueRelay<Void>
         let searchTextDidChange: CurrentValueRelay<String>
         let searchButtonDidTap: CurrentValueRelay<Void>
+        let searchWeatherCellDidTap: CurrentValueRelay<Int>
     }
     
     struct Output {
         let updateWeatherSearch: CurrentValueRelay<Bool>
         let dismissKeyboard: CurrentValueRelay<Void>
+        let moveToMainController: CurrentValueRelay<Int>
         let presentError: CurrentValueRelay<(title: String, message: String)>
     }
     
     private let output = Output(
         updateWeatherSearch: CurrentValueRelay(true),
         dismissKeyboard: CurrentValueRelay(()),
+        moveToMainController: CurrentValueRelay(0),
         presentError: CurrentValueRelay((title: "", message: ""))
     )
     
     private(set) var filteredWeatherArray: [SearchWeatherEntity] = []
     private var searchWeatherEntityArray: [SearchWeatherEntity] = []
     private var cityInfoArray: [CityInfoEntity] = []
-    private var cityWeatherDictionary: [ID: CurrentWeatherEntity] = [:]
+    private var cityWeatherDictionary: [WeatherID: CurrentWeatherEntity] = [:]
     
     private let localCountyService: LocalCountryServiceInterface
     private let weatherNetworkService: WeatherNetworkServiceInterface
@@ -65,6 +68,12 @@ final class SearchViewModel: InputOutputModel {
         input.searchButtonDidTap.bind { [weak self] _ in
             guard let self else { return }
             output.dismissKeyboard.send(())
+        }
+        
+        input.searchWeatherCellDidTap.bind { [weak self] index in
+            guard let self else { return }
+            let didTapCellIndex = filteredWeatherArray[index].cityInfoEntity.id
+            output.moveToMainController.send(didTapCellIndex)
         }
         
         return output
@@ -109,10 +118,10 @@ final class SearchViewModel: InputOutputModel {
                 
                 switch result {
                 case .success(let currentWeatherEntity):
-                    dispatchGroup.leave()
                     for (id, currentWeather) in zip(groupIDArray, currentWeatherEntity) {
                         cityWeatherDictionary[id] = currentWeather
                     }
+                    dispatchGroup.leave()
                     
                 case .failure(let error):
                     output.presentError.send((
