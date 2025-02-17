@@ -9,6 +9,9 @@ import UIKit
 import SnapKit
 
 final class SearchViewController: UIViewController {
+    
+    private let viewModel: SearchViewModel
+    private let input: SearchViewModel.Input
 
     private let weatherSearchController: UISearchController = {
         let searchController = UISearchController()
@@ -31,14 +34,39 @@ final class SearchViewController: UIViewController {
         return collectionView
     }()
     
+    init(viewModel: SearchViewModel) {
+        self.viewModel = viewModel
+        self.input = SearchViewModel.Input(viewDidLoad: CurrentValueRelay(()))
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureBindingData()
         configureNavigation()
         configureCollectionView()
         configureView()
         configureHierarchy()
         configureLayout()
+        
+        input.viewDidLoad.send(())
+    }
+    
+    private func configureBindingData() {
+        let output = viewModel.transform(from: input)
+        
+        output.updateWeatherSearch.bind { [weak self] _ in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.weatherSearchCollectionView.reloadData()
+            }
+        }
     }
     
     private func configureNavigation() {
@@ -77,7 +105,7 @@ final class SearchViewController: UIViewController {
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel.searchWeatherEntityArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -86,6 +114,7 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
             for: indexPath
         ) as? WeatherSearchCollectionViewCell else { return UICollectionViewCell() }
         
+        cell.configureView(with: viewModel.searchWeatherEntityArray[indexPath.item])
         return cell
     }
 }

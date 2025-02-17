@@ -6,20 +6,19 @@
 //
 
 import UIKit
+import Kingfisher
 import SnapKit
 
 final class WeatherSearchCollectionViewCell: UICollectionViewCell, ReusableViewProtocol {
     
     private let cityTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "서울" // TODO: 삭제
         label.font = .systemFont(ofSize: 20, weight: .bold)
         return label
     }()
     
     private let countryTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "대한민국" // TODO: 삭제
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray
         return label
@@ -27,7 +26,6 @@ final class WeatherSearchCollectionViewCell: UICollectionViewCell, ReusableViewP
     
     private let temperatureInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = "최저 20° 최고 28°" // TODO: 삭제
         label.font = .systemFont(ofSize: 12, weight: .semibold)
         label.textColor = .gray
         label.numberOfLines = 0
@@ -36,13 +34,11 @@ final class WeatherSearchCollectionViewCell: UICollectionViewCell, ReusableViewP
     
     private let weatherIconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .gray // TODO: 삭제
         return imageView
     }()
     
     private let currentTemperatureLabel: UILabel = {
         let label = UILabel()
-        label.text = "20.1°" // TODO: 삭제
         label.font = .systemFont(ofSize: 28, weight: .bold)
         return label
     }()
@@ -58,6 +54,14 @@ final class WeatherSearchCollectionViewCell: UICollectionViewCell, ReusableViewP
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configureView(with weatherInfo: SearchWeatherEntity) {
+        cityTitleLabel.text = weatherInfo.cityInfoEntity.cityKoreanName
+        countryTitleLabel.text = weatherInfo.cityInfoEntity.countryKoreanName
+        temperatureInfoLabel.text = "최저 \(weatherInfo.currentWeatherEntity.minTemperature)° 최고 \(weatherInfo.currentWeatherEntity.maxTemperature)°"
+        weatherIconImageView.kf.setImage(with: URL(string: Secret.openWeatherIconURL(with: weatherInfo.currentWeatherEntity.icon)))
+        currentTemperatureLabel.text = "\(weatherInfo.currentWeatherEntity.currentTemperature)°"
     }
     
     private func configureView() {
