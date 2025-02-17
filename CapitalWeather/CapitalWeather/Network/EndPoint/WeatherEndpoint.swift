@@ -10,6 +10,7 @@ import Foundation
 
 enum WeatherEndpoint: Router {
     case weatherInfo(id: Int)
+    case weatherGroupInfo(idArray: [Int])
     case currentWeather(latitude: Double, longitude: Double)
 }
 
@@ -28,6 +29,8 @@ extension WeatherEndpoint {
         switch self {
         case .weatherInfo:
             return "/data/2.5/weather"
+        case .weatherGroupInfo:
+            return "/data/2.5/group"
         case .currentWeather:
             return "/data/2.5/weather"
         }
@@ -36,6 +39,8 @@ extension WeatherEndpoint {
     var method: HTTPMethod {
         switch self {
         case .weatherInfo:
+            return .get
+        case .weatherGroupInfo:
             return .get
         case .currentWeather:
             return .get
@@ -52,7 +57,15 @@ extension WeatherEndpoint {
             return [
                 "id": id,
                 "appid": Secret.openWeatherAppID,
-                "lang": "kr"
+                "lang": "kr",
+                "units": "metric"
+            ]
+        case .weatherGroupInfo(let idArray):
+            return [
+                "id": idArray.map { String($0) }.joined(separator: ","),
+                "appid": Secret.openWeatherAppID,
+                "lang": "kr",
+                "units": "metric"
             ]
         case .currentWeather(let latitude, let longitude):
             return [
