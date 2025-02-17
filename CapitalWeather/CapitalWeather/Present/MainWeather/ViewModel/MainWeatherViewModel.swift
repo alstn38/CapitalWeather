@@ -36,7 +36,7 @@ final class MainWeatherViewModel: InputOutputModel {
     private(set) var currentWeatherInfoArray: [WeatherInfoType] = []
     private var cityName: String = ""
     
-    private let currentCityID: Int
+    private var currentCityID: Int
     private let localCountryService: LocalCountryServiceInterface
     private let weatherNetworkService: WeatherNetworkServiceInterface
 
@@ -73,6 +73,7 @@ final class MainWeatherViewModel: InputOutputModel {
         input.updateWeatherInfo.bind { [weak self] weatherID in
             guard let self else { return }
             UserDefaultManager.shared.selectCityID = weatherID
+            currentCityID = weatherID
             currentWeatherInfoArray.removeAll()
             fetchCountryName(at: currentCityID)
             fetchCurrentDate()
