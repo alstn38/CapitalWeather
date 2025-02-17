@@ -26,5 +26,6 @@ enum StringLiterals {
     enum SearchView {
         static let title: String = "도시 검색"
         static let searchPlaceholder: String = "지금, 날씨가 궁금한 곳은?"
+        static let noSearchResultGuideText: String = "원하는 도시를 찾지 못했습니다."
     }
 }
