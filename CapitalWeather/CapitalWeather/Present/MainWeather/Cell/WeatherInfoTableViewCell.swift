@@ -101,11 +101,13 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
         
         let weatherInfoText = "오늘의 날씨는 \(description) 입니다"
         weatherInfoLabel.text = weatherInfoText
+        highlightSearchedLabelText(weatherInfoLabel, searchedTexts: description)
     }
     
     private func configureTemperature(current: String, min: String, max: String) {
         let weatherInfoText = "현재 온도는 \(current) 입니다"
         weatherInfoLabel.text = weatherInfoText
+        highlightSearchedLabelText(weatherInfoLabel, searchedTexts: current)
         
         let weatherTemperatureText = "최저 \(min) 최고 \(max)"
         weatherTemperatureLabel.text = weatherTemperatureText
@@ -114,22 +116,39 @@ final class WeatherInfoTableViewCell: UITableViewCell, ReusableViewProtocol {
     private func configureTemperature(feel: String) {
         let weatherInfoText = "체감 온도는 \(feel) 입니다"
         weatherInfoLabel.text = weatherInfoText
+        highlightSearchedLabelText(weatherInfoLabel, searchedTexts: feel)
     }
     
     private func configureSunTime(cityName: String, rise: String, set: String) {
         let weatherInfoText = "\(cityName)의 일출 시각은 \(rise), 일몰 시각은 \(set)입니다."
         weatherInfoLabel.text = weatherInfoText
+        highlightSearchedLabelText(weatherInfoLabel, searchedTexts: rise, set)
     }
     
     private func configureHumidityAndWindSpeed(humidity: String, windSpeed: String) {
         let weatherInfoText = "습도는 \(humidity)이고, 풍속은 \(windSpeed) 입니다"
         weatherInfoLabel.text = weatherInfoText
+        highlightSearchedLabelText(weatherInfoLabel, searchedTexts: humidity, windSpeed)
     }
     
     private func configureTodayPhoto(photoLink: String) {
         let weatherInfoText = "오늘의 사진"
         weatherInfoLabel.text = weatherInfoText
         todayWeatherImageView.kf.setImage(with: URL(string: photoLink))
+    }
+    
+    private func highlightSearchedLabelText(_ label: UILabel, searchedTexts: String...) {
+        guard let labelText = label.text else { return }
+        let attributedString = NSMutableAttributedString(string: labelText)
+        
+        for searchedText in searchedTexts {
+            guard let searchedRange = labelText.range(of: searchedText, options: .caseInsensitive) else { return }
+            let fontSize = label.font.pointSize
+            let nsRange = NSRange(searchedRange, in: labelText)
+            attributedString.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: fontSize), range: nsRange)
+        }
+        
+        label.attributedText = attributedString
     }
     
     private func configureView() {
