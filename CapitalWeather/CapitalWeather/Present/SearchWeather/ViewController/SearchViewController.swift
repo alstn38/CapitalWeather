@@ -31,12 +31,26 @@ final class SearchViewController: UIViewController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = .clear
+        collectionView.keyboardDismissMode = .onDrag
         return collectionView
+    }()
+    
+    private let noSearchResultGuideLabel: UILabel = {
+        let label = UILabel()
+        label.text = StringLiterals.SearchView.noSearchResultGuideText
+        label.font = .systemFont(ofSize: 15, weight: .medium)
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
     }()
     
     init(viewModel: SearchViewModel) {
         self.viewModel = viewModel
-        self.input = SearchViewModel.Input(viewDidLoad: CurrentValueRelay(()))
+        self.input = SearchViewModel.Input(
+            viewDidLoad: CurrentValueRelay(()),
+            searchTextDidChange: CurrentValueRelay(("")),
+            searchButtonDidTap: CurrentValueRelay(())
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -61,11 +75,23 @@ final class SearchViewController: UIViewController {
     private func configureBindingData() {
         let output = viewModel.transform(from: input)
         
-        output.updateWeatherSearch.bind { [weak self] _ in
+        output.updateWeatherSearch.bind { [weak self] hasValue in
             guard let self else { return }
             DispatchQueue.main.async {
                 self.weatherSearchCollectionView.reloadData()
+                self.weatherSearchCollectionView.isHidden = !hasValue
+                self.noSearchResultGuideLabel.isHidden = hasValue
             }
+        }
+        
+        output.dismissKeyboard.bind { [weak self] _ in
+            guard let self else { return }
+            view.endEditing(true)
+        }
+        
+        output.presentError.bind { [weak self] (title, message) in
+            guard let self else { return }
+            presentAlert(title: title, message: message)
         }
     }
     
@@ -74,6 +100,7 @@ final class SearchViewController: UIViewController {
         navigationItem.hidesSearchBarWhenScrolling = false
         navigationItem.title = StringLiterals.SearchView.title
         navigationItem.searchController = weatherSearchController
+        weatherSearchController.searchBar.delegate = self
     }
     
     private func configureCollectionView() {
@@ -91,12 +118,20 @@ final class SearchViewController: UIViewController {
     }
     
     private func configureHierarchy() {
-        view.addSubview(weatherSearchCollectionView)
+        view.addSubviews(
+            weatherSearchCollectionView,
+            noSearchResultGuideLabel
+        )
     }
     
     private func configureLayout() {
         weatherSearchCollectionView.snp.makeConstraints {
             $0.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        noSearchResultGuideLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(120)
+            $0.centerX.equalToSuperview()
         }
     }
 }
@@ -105,7 +140,7 @@ final class SearchViewController: UIViewController {
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.searchWeatherEntityArray.count
+        return viewModel.filteredWeatherArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -114,7 +149,19 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
             for: indexPath
         ) as? WeatherSearchCollectionViewCell else { return UICollectionViewCell() }
         
-        cell.configureView(with: viewModel.searchWeatherEntityArray[indexPath.item])
+        cell.configureView(with: viewModel.filteredWeatherArray[indexPath.item])
         return cell
+    }
+}
+
+// MARK: - UISearchBarDelegate
+extension SearchViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        input.searchTextDidChange.send(searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        input.searchButtonDidTap.send(())
     }
 }

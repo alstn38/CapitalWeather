@@ -13,20 +13,24 @@ final class SearchViewModel: InputOutputModel {
     
     struct Input {
         let viewDidLoad: CurrentValueRelay<Void>
-        
+        let searchTextDidChange: CurrentValueRelay<String>
+        let searchButtonDidTap: CurrentValueRelay<Void>
     }
     
     struct Output {
-        let updateWeatherSearch: CurrentValueRelay<Void>
+        let updateWeatherSearch: CurrentValueRelay<Bool>
+        let dismissKeyboard: CurrentValueRelay<Void>
         let presentError: CurrentValueRelay<(title: String, message: String)>
     }
     
     private let output = Output(
-        updateWeatherSearch: CurrentValueRelay(()),
+        updateWeatherSearch: CurrentValueRelay(true),
+        dismissKeyboard: CurrentValueRelay(()),
         presentError: CurrentValueRelay((title: "", message: ""))
     )
     
-    private(set) var searchWeatherEntityArray: [SearchWeatherEntity] = []
+    private(set) var filteredWeatherArray: [SearchWeatherEntity] = []
+    private var searchWeatherEntityArray: [SearchWeatherEntity] = []
     private var cityInfoArray: [CityInfoEntity] = []
     private var cityWeatherDictionary: [ID: CurrentWeatherEntity] = [:]
     
@@ -42,6 +46,25 @@ final class SearchViewModel: InputOutputModel {
         input.viewDidLoad.bind { [weak self] _ in
             guard let self else { return }
             fetchAllCountryInfo()
+        }
+        
+        input.searchTextDidChange.bind { [weak self] text in
+            guard let self else { return }
+            let lowercasedText = text.lowercased().replacingOccurrences(of: " ", with: "")
+            
+            guard !lowercasedText.isEmpty else {
+                filteredWeatherArray = searchWeatherEntityArray
+                output.updateWeatherSearch.send(true)
+                return
+            }
+            
+            filteredWeatherArray = searchWeatherEntityArray.filter { $0.hasSearchText(text: lowercasedText) }
+            output.updateWeatherSearch.send(!filteredWeatherArray.isEmpty)
+        }
+        
+        input.searchButtonDidTap.bind { [weak self] _ in
+            guard let self else { return }
+            output.dismissKeyboard.send(())
         }
         
         return output
@@ -123,6 +146,7 @@ final class SearchViewModel: InputOutputModel {
             )
             searchWeatherEntityArray.append(searchWeather)
         }
-        output.updateWeatherSearch.send(())
+        filteredWeatherArray = searchWeatherEntityArray
+        output.updateWeatherSearch.send(true)
     }
 }
