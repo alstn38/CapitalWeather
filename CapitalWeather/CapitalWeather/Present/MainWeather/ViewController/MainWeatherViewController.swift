@@ -63,7 +63,13 @@ final class MainWeatherViewController: UIViewController {
         
         output.moveToSearchController.bind { [weak self] _ in
             guard let self else { return }
-            let searchViewController = SearchViewController()
+            let localCountyService = LocalCountryService()
+            let weatherNetworkService = WeatherNetworkService()
+            let searchViewModel = SearchViewModel(
+                localCountyService: localCountyService,
+                weatherNetworkService: weatherNetworkService
+            )
+            let searchViewController = SearchViewController(viewModel: searchViewModel)
             navigationController?.pushViewController(searchViewController, animated: true)
         }
         
